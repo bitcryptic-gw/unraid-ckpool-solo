@@ -19,10 +19,6 @@ RUN git clone https://bitbucket.org/ckolivas/ckpool.git /build/ckpool \
     && cp src/ckpool /usr/local/bin/ckpool \
     && rm -rf /build
 
-RUN useradd -r -s /bin/false ckpool
-
-USER ckpool
-
 EXPOSE 3333
 
 ENTRYPOINT ["/usr/local/bin/ckpool", "--config", "/config/ckpool.conf"]
