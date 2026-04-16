@@ -1,0 +1,11 @@
+{
+  "btcd" : [{
+    "url" : "YOUR-BITCOIN-CORE-IP-OR-CONTAINER-NAME:8332",
+    "auth" : "YOUR-RPC-USERNAME",
+    "pass" : "YOUR-RPC-PASSWORD"
+  }],
+  "btcaddress" : "YOUR-BITCOIN-ADDRESS",
+  "btcsig" : "Solo Miner",
+  "serverurl" : ["0.0.0.0:3333"],
+  "logdir" : "/logs"
+}
