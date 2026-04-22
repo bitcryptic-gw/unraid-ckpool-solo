@@ -7,7 +7,7 @@
   <MyIP>10.61.21.5</MyIP>
   <Shell>bash</Shell>
   <Privileged>false</Privileged>
-  <Support>https://forums.unraid.net/topic/XXXXX</Support>
+  <Support>https://forums.unraid.net/topic/198377-support-ckpool-solo-self-hosted-bitcoin-solo-mining-for-unraid/</Support>
   <Project>https://bitbucket.org/ckolivas/ckpool-solo</Project>
   <Overview>
     Self-hosted Bitcoin solo mining stratum server for Unraid.
