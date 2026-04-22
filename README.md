@@ -48,6 +48,6 @@ This template uses the `fixedips` Docker network by default, assigning a static 
 ## Links
 
 - [Docker Hub](https://hub.docker.com/r/bitcryptic/ckpool-solo)
-- [Unraid forum support thread](https://forums.unraid.net/topic/XXXXX) ← update at go-live
+- [Unraid forum support thread](https://forums.unraid.net/topic/198377-support-ckpool-solo-self-hosted-bitcoin-solo-mining-for-unraid/)
 - [ckpool upstream (Bitbucket)](https://bitbucket.org/ckolivas/ckpool-solo)
 - [BitCryptic](https://bitcryptic.com)
