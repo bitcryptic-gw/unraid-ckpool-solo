@@ -41,7 +41,9 @@ This template uses the `fixedips` Docker network by default, assigning a static 
 
 ## Notes
 
-- The `-k` flag is used to kill stale PID files on startup, preventing stuck-container issues after unclean shutdowns
+- The image entrypoint (`docker-entrypoint.sh`) wipes `/tmp/ckpool` — runtime PID + IPC socket state only, never persistent data — on every container start. After an unclean shutdown (e.g. Docker's stop timeout SIGKILLs ckpool) a stale `/tmp/ckpool/main.pid` could otherwise block a restart, since the new container also runs as PID 1 and ckpool mistakes it for a live old instance. The wipe makes the container self-recovering on next start.
+- ckpool handles SIGTERM gracefully (this is Docker's default stop signal), so no custom `STOPSIGNAL` is needed. The template sets `--stop-timeout=30` to give ckpool time to finish its shutdown path before Docker escalates to SIGKILL.
+- Persistent data is only ever in your bind-mounted config and log paths (e.g. `/etc/ckpool` and `/var/log/ckpool`); the `/tmp/ckpool` wipe never touches them.
 - Exclude this container from Unraid's Appdata Backup plugin to prevent SIGTERM restarts during backup
 - Container runs as root (required for log directory creation)
 

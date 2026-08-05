@@ -27,7 +27,11 @@
   <WebUI/>
   <TemplateURL>https://raw.githubusercontent.com/bitcryptic-gw/unraid-ckpool-solo/main/ckpool-solo.xml</TemplateURL>
   <Icon>https://raw.githubusercontent.com/bitcryptic-gw/unraid-ckpool-solo/main/icon.png</Icon>
-  <ExtraParams>--restart=unless-stopped</ExtraParams>
+  <!-- --stop-timeout=30 gives ckpool time to finish its SIGTERM shutdown path
+       before Docker escalates to SIGKILL. The image entrypoint wipes /tmp/ckpool
+       runtime state on every start, so even a SIGKILLed stop can never block a
+       fresh container start. -->
+  <ExtraParams>--restart=unless-stopped --stop-timeout=30</ExtraParams>
   <PostArgs>-B -c /etc/ckpool/ckpool.conf -k</PostArgs>
   <CPUset/>
   <DateInstalled/>
