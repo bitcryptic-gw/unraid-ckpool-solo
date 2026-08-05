@@ -22,7 +22,8 @@ Drop the XML directly into `/boot/config/plugins/dockerMan/templates-user/` on y
 
 | Variable | Description | Required |
 |---|---|---|
-| AppData path | Host path for config and logs | Yes |
+| Config Directory | Host path containing `ckpool.conf` (mounted read-only at `/config`) | Yes |
+| Log Directory | Host path for ckpool logs (mounted at `/logs`) | Yes |
 | Stratum port | Default 3333 | Yes |
 
 ## ckpool.conf Example
@@ -33,7 +34,7 @@ Key fields:
 - `btcd.url` — Bitcoin Core RPC endpoint (e.g. `10.61.21.4:8332`)
 - `btcd.auth` / `btcd.pass` — RPC credentials (use `rpcauth` in `bitcoin.conf`)
 - `btcaddress` — your Bitcoin address for block rewards
-- `logdir` — set to `/var/log/ckpool` (maps to your AppData logs path)
+- `logdir` — set to `/logs` (maps to your Log Directory bind mount)
 
 ## Network Note
 
@@ -43,7 +44,8 @@ This template uses the `fixedips` Docker network by default, assigning a static 
 
 - The image entrypoint (`docker-entrypoint.sh`) wipes `/tmp/ckpool` — runtime PID + IPC socket state only, never persistent data — on every container start. After an unclean shutdown (e.g. Docker's stop timeout SIGKILLs ckpool) a stale `/tmp/ckpool/main.pid` could otherwise block a restart, since the new container also runs as PID 1 and ckpool mistakes it for a live old instance. The wipe makes the container self-recovering on next start.
 - ckpool handles SIGTERM gracefully (this is Docker's default stop signal), so no custom `STOPSIGNAL` is needed. The template sets `--stop-timeout=30` to give ckpool time to finish its shutdown path before Docker escalates to SIGKILL.
-- Persistent data is only ever in your bind-mounted config and log paths (e.g. `/etc/ckpool` and `/var/log/ckpool`); the `/tmp/ckpool` wipe never touches them.
+- Persistent data is only ever in your bind-mounted config and log paths (`/config` and `/logs`); the `/tmp/ckpool` wipe never touches them.
+- ckpool runs in the foreground as PID 1 via the image entrypoint, so Docker can deliver signals and supervise the process correctly. No daemon flags (`-B`) or PostArgs are used.
 - Exclude this container from Unraid's Appdata Backup plugin to prevent SIGTERM restarts during backup
 - Container runs as root (required for log directory creation)
 

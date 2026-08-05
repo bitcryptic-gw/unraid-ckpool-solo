@@ -12,7 +12,7 @@
   <Overview>
     Self-hosted Bitcoin solo mining stratum server for Unraid.
 
-    Runs ckpool in BTCSOLO mode (-B flag), built from the official Con Kolivas source. Point your ASICs at this server and it relays work from your local Bitcoin Core node. 100% of any block reward goes directly to your configured Bitcoin address — no pool, no fees, no middleman.
+    Built from the official Con Kolivas ckpool source. Point your ASICs at this server and it relays work from your local Bitcoin Core node. 100% of any block reward goes directly to your configured Bitcoin address — no pool, no fees, no middleman.
 
     Requires a fully synced Bitcoin Core node with RPC enabled, reachable from this container. Configure RPC credentials and your Bitcoin address in ckpool.conf before starting.
 
@@ -27,22 +27,28 @@
   <WebUI/>
   <TemplateURL>https://raw.githubusercontent.com/bitcryptic-gw/unraid-ckpool-solo/main/ckpool-solo.xml</TemplateURL>
   <Icon>https://raw.githubusercontent.com/bitcryptic-gw/unraid-ckpool-solo/main/icon.png</Icon>
-  <!-- --stop-timeout=30 gives ckpool time to finish its SIGTERM shutdown path
-       before Docker escalates to SIGKILL. The image entrypoint wipes /tmp/ckpool
-       runtime state on every start, so even a SIGKILLed stop can never block a
-       fresh container start. -->
+  <!-- A 30 second stop timeout gives ckpool time to finish its SIGTERM
+       shutdown path before Docker escalates to SIGKILL. The image entrypoint
+       wipes /tmp/ckpool runtime state on every start, so even a SIGKILLed
+       stop can never block a fresh container start. -->
   <ExtraParams>--restart=unless-stopped --stop-timeout=30</ExtraParams>
-  <PostArgs>-B -c /etc/ckpool/ckpool.conf -k</PostArgs>
+  <!-- No PostArgs: ckpool runs in the foreground as PID 1 via the image
+       entrypoint (docker-entrypoint.sh), which wipes stale /tmp/ckpool state
+       and execs ckpool with the config at /config/ckpool.conf. Adding a
+       daemon-style -B here would background ckpool and break Docker process
+       supervision, and -k is unnecessary because the entrypoint already
+       removes stale PID files. -->
+  <PostArgs></PostArgs>
   <CPUset/>
   <DateInstalled/>
   <DonateText/>
   <DonateLink/>
   <Requires>Bitcoin Core node with RPC enabled on the same Docker network or LAN.</Requires>
-  <Config Name="AppData" Target="/etc/ckpool" Default="/mnt/cache/appdata/ckpool-solo" Mode="rw"
-    Description="Path to ckpool.conf and runtime data. Must contain a valid ckpool.conf before starting."
+  <Config Name="Config Directory" Target="/config" Default="/mnt/user/appdata/ckpool-solo/config" Mode="ro"
+    Description="Path to ckpool.conf. Must contain a valid ckpool.conf before starting. Mounted read-only — ckpool never writes here."
     Type="Path" Display="always" Required="true" Mask="false"/>
-  <Config Name="Logs" Target="/var/log/ckpool" Default="/mnt/cache/appdata/ckpool-solo/logs" Mode="rw"
-    Description="Log output directory."
+  <Config Name="Log Directory" Target="/logs" Default="/mnt/user/appdata/ckpool-solo/logs" Mode="rw"
+    Description="Log output directory. ckpool's logdir must be /logs in ckpool.conf."
     Type="Path" Display="always" Required="true" Mask="false"/>
   <Config Name="Stratum Port" Target="3333" Default="3333" Mode="tcp"
     Description="Stratum port for miners to connect to. Point your ASICs at stratum+tcp://[unraid-ip]:3333"
